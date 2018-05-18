@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <title>D3 Work</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <link rel="stylesheet" href="irisscatter.css">
+    </style>
+  </head>
+  <body>
+    <script>
+    
+      var outerWidth = 750;
+      var outerHeight = 450;
+      var margin = {left:80, top: 5, right: 5, bottom: 60 };
+       var innerWidth  = outerWidth  - margin.left - margin.right;
+      var innerHeight = outerHeight - margin.top  - margin.bottom;
+      var rMin = 1; 
+      var rMax = 10;
+      var xColumn = "sepal_length";
+      var yColumn = "petal_length";
+      var rColumn = "sepal_width";
+      var colorColumn = "species";
+
+      var xAxisLabel = "Sepal Length (cm)";
+      var xAxisOffset = 38;
+
+      var yAxisLabel = "Petal Length (cm)";
+      var yAxisOffset = -39;
+
+      var svg = d3.select("body").append("svg")
+                   .attr("width",outerWidth)
+                   .attr("height",outerHeight);
+
+      var g = svg.append("g")
+                 .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+      var xAxisG = g.append("g")
+                    .attr("class","x axis")
+                    .attr("transform","translate(0," + innerHeight + ")")
+      var xAxisLabel = xAxisG.append("text")
+                             .style("text-anchor","middle")
+                             .attr("x",innerWidth/2)
+                             .attr("y",xAxisOffset)
+                             .attr("class","label")
+                             .text(xAxisLabel); 
+  
+      var yAxisG = g.append("g")
+                    .attr("class","y axis");
+      var yAxisLabel = yAxisG.append("text")
+                             .style("text-anchor","middle")
+                             .attr("transform","translate("+yAxisOffset + "," +(innerHeight/2) + ")rotate(-90)")
+                             .attr("class","label")
+                             .text(yAxisLabel);
+
+      var xScale = d3.scale.linear().range([0, innerWidth]);
+      var yScale = d3.scale.linear().range([innerHeight, 0]);
+      var rScale = d3.scale.linear().range([rMin, rMax]);
+      var colorScale = d3.scale.category10();
+
+      var xAxis = d3.svg.axis().scale(xScale).orient("bottom")
+                    .ticks(9)
+                    .tickFormat(d3.format("s"))
+                    .outerTickSize(0);
+
+      var yAxis = d3.svg.axis().scale(yScale).orient("left")
+                    .ticks(9)
+                    .tickFormat(d3.format("s"))
+                    .outerTickSize(0);
+
+      function render(data) {
+        xScale.domain(d3.extent(data,function (d){ return d[xColumn]; }));
+        yScale.domain(d3.extent(data,function (d){ return d[yColumn]; }));
+        rScale.domain(d3.extent(data,function (d){ return d[rColumn]; }));
+
+        xAxisG.call(xAxis);
+        yAxisG.call(yAxis);
+
+        var circles = g.selectAll("circle").data(data);
+        circles.enter().append("circle");
+        circles.attr("cx",function (d){ return xScale(d[xColumn]); })
+               .attr("cy",function (d){ return yScale(d[yColumn]); })
+               .attr("r", function (d){ return rScale(d[rColumn]); })
+               .attr("stroke",function (d){ return colorScale(d[colorColumn]); });
+
+        circles.exit().remove();
+      }
+
+      function type(d) {
+        d.sepal_length = +d.sepal_length;
+        d.sepal_width  = +d.sepal_width;
+        d.petal_length = +d.petal_length;
+        d.petal_width  = +d.petal_width;
+        return d;
+      }
+
+      d3.csv("iris.csv", type, render);
+
+    </script>
+  </body>
+</html>
