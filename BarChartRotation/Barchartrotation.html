@@ -1,0 +1,88 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>D3 Work</title>
+     <script src="http://d3js.org/d3.v3.min.js"></script>
+     <link rel="stylesheet" href="Barrotation.css">
+  </head>
+  <body>
+    <script>
+
+      var outerWidth = 600;
+      var outerHeight = 400;
+      var margin = { left: 50, top: 110, right: 20, bottom: 60 };
+      var innerWidth  = outerWidth  - margin.left - margin.right;
+      var innerHeight = outerHeight - margin.top  - margin.bottom;
+      var barPadding = 0.5;
+      var parseDate = d3.time.format("%Y-%m").parse;
+
+      var xColumn = "date";
+      var yColumn = "value";
+
+      var svg = d3.select("body").append("svg")
+                  .attr("width",outerWidth)
+                  .attr("height",outerHeight);
+
+      var g = svg.append("g")
+                 .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+      var xAxisG = g.append("g")
+                    .attr("class","axis")
+                    .attr("transform","translate(0," + innerHeight + ")");
+
+      var yAxisG = g.append("g")
+                    .attr("class","axis");
+
+      var xScale = d3.scale.ordinal().rangeBands([0,innerWidth],barPadding);
+      var yScale = d3.scale.linear().range([innerHeight,0]);
+
+      var xAxis = d3.svg.axis().scale(xScale).orient("bottom")
+                    .tickFormat(d3.time.format("%Y-%m"))
+                    .outerTickSize(0);
+
+      var yAxis = d3.svg.axis().scale(yScale).orient("left")
+                   .outerTickSize(0)
+                   .ticks(10);              
+
+      function render(data) {
+
+        xScale.domain(data.map(function (d){ return d[xColumn]; }));
+        yScale.domain([0,d3.max(data,function (d){ return d[yColumn]; })]);
+
+        xAxisG.call(xAxis)
+              .selectAll("text")
+              .style("text-anchor","end")
+              .attr("dx","-.8em")
+              .attr("dy","-.1em")
+              .attr("transform","rotate(-40)" );
+
+        yAxisG.call(yAxis)
+              .append("text")
+              .attr("transform","rotate(-90)")
+              .attr("y",10)
+              .attr("dy",".20em")
+              .style("text-anchor","end")
+              .text("Value ($)");
+
+        var bars = g.selectAll("rect").data(data);
+        bars.enter().append("rect")
+            .style("fill","steelblue")
+            .attr("width",xScale.rangeBand());
+        bars
+          .attr("x",function (d){ return xScale(d[xColumn]); })
+          .attr("y",function (d){ return yScale(d[yColumn]); })
+          .attr("height",function (d){ return innerHeight - yScale(d[yColumn]); });
+        bars.exit().remove();
+      }
+
+      function type(d) {
+        d.date = parseDate(d.date);
+        d.value = +d.value;
+        return d;
+      }
+
+      d3.csv("bar-data.csv", type, render);
+
+    </script>
+  </body>
+</html>
