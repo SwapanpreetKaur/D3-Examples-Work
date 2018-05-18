@@ -1,0 +1,23 @@
+.axis text {
+font-size: 12pt;
+      }
+
+.axis .label {
+        font-size: 20pt;
+      }
+
+.axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+
+.d3_tip {
+  background: black;
+  color: white;
+  width: 120px;
+  height: 80px;
+  border-radius: 3px;
+}
+
