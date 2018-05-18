@@ -1,0 +1,14 @@
+.axis {
+    font-size: 8pt;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: black;
+  }
+
+   .axis .label{
+    font-size: 16pt;
+   }
+  

@@ -1,0 +1,97 @@
+<html>
+<head>
+<title>D3 Work</title>
+ <script src="http://d3js.org/d3.v3.min.js"></script>
+  <link rel="stylesheet" href="letter.css">
+ <body>
+ 	<script>
+
+ 		var outerWidth = 800;
+ 		var outerHeight = 400;
+ 	    var margin = {top: 110,bottom: 60,left: 80,right: 20};
+ 	    var innerHeight = outerHeight - margin.top - margin.bottom;
+ 	    var innerWidth = outerWidth - margin.left - margin.right;
+
+ 	    var xColumn = 'letter';
+ 	    var yColumn = 'frequency';
+
+ 	    var xAxisLabel = "FREQUENCY";
+ 	    var xAxisOffset = '45';
+
+ 	    var yAxisLabel = "LETTERS";
+ 	    var yAxisOffset = '-45';
+
+ 	    var barPadding = 0.5;
+        var percentFormat = d3.format(".0%");
+
+ 	    var svg = d3.select("body").append("svg")
+                    .attr("width",outerWidth)
+                    .attr("height",outerHeight);
+
+        var g =   svg.append("g")
+                   .attr("transform","translate("+ margin.left + "," + margin.top + ")");
+
+        var xAxisG = g.append("g")
+                    .attr("class","axis")
+                    .attr("transform","translate(0,"+ innerHeight +")")
+
+        var xAxisLabel = xAxisG.append("text")
+                               .style("text-anchor", "middle")
+                               .attr("x", innerWidth / 2)
+                               .attr("y", xAxisOffset)               
+                               .attr("class", "label")
+                               .text(xAxisLabel);
+
+       var yAxisG = g.append("g")
+        .attr("class", "axis")
+
+       var yAxisLabel = yAxisG.append('text')
+                                 .style('text-anchor','middle')
+                                 //translate in direction by yAxislabeloffset and in y using -90 rotation
+                                 .attr("transform", "translate(" + yAxisOffset + "," + (innerHeight / 2) + ") rotate(-90)")
+                                 .attr('class','label')
+                                 .text(yAxisLabel);
+
+      var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], barPadding);
+      var yScale = d3.scale.linear().range([innerHeight, 0]);
+
+      var xAxis = d3.svg.axis().scale(xScale).orient("bottom")
+                     .outerTickSize(0);
+      var yAxis = d3.svg.axis().scale(yScale).orient("left")
+                    .ticks(10)                   
+                    .tickFormat(percentFormat)
+                    .outerTickSize(0); 
+
+      function render(data) {
+
+        xScale.domain(data.map( function (d){ return d[xColumn]; }));
+        yScale.domain([0, d3.max(data, function (d){ return d[yColumn]; })]);
+       
+        xAxisG.call(xAxis);
+        yAxisG.call(yAxis);
+             
+        var bars = g.selectAll("rect").data(data);
+        bars.enter().append("rect")
+           .style("fill", "steelblue")
+          .attr("width", xScale.rangeBand());
+        bars
+          .attr("x",function (d){ return xScale(d[xColumn]); })
+          .attr("y",function (d){ return yScale(d[yColumn]); })
+          .attr("height",function (d){ return innerHeight - yScale(d[yColumn]); })
+        bars.exit().remove();
+      }
+
+      function type(d) {
+        d.frequency = +d.frequency;
+        return d;
+      }
+
+      d3.csv("lfreq.csv", type, render);
+
+    </script>
+  </body>
+</html>        
+
+
+
+
