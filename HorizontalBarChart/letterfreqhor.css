@@ -1,0 +1,17 @@
+ .axis text {
+        font: 14pt ;
+      }
+
+  .axis path {
+        stroke: red;
+        shape-rendering: crispEdges;
+  }
+
+ .axis line{
+        stroke: blue;
+        shape-rendering: crispEdges;
+    }
+      
+  .y.axis path, .y.axis line {
+        stroke: none;
+      }
