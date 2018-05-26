@@ -96,10 +96,10 @@
 
     var layers = stack(nested);
  
-    //Set the layer[0] (christian) religion for all countries
+    //Set the layer[0]  5 years age for all countries
     xScale.domain(layers[0].values.map(function(d){ return d[xColumn]}));
 
-    //Each call return max values of religions in different countries
+    //Each call return max values of ages,years in different states
     yScale.domain([
           0,
           d3.max(layers, function (layer){
